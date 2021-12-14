@@ -1,13 +1,11 @@
-# Projeto XXXX
-## FPRO/MIEIC, 2021/22
-## Fulano de Tal (up2021xxxxx)
-## 1MIEICXX
+# Projeto Joust
+## FPRO/LEIC, 2021/22
+## Afonso Castro Vaz Osório (up202108700)
+## 1LEIC003
 
 ### Objetivo
 
-1. Criar um clone do clássico Sokoban em Pygame...
-
-2. Em alternativa... do clássico x em Pygame.
+1. Criar um clone do clássico Joust em Pygame.
 
 ### Repositório de código
 
