@@ -28,6 +28,8 @@
 Para empurrar o caixote é preciso ir ao outro lado empurrá-lo. 
 Ou seja, se ele ficar junto à parede, a pessoa precisa de reiniciar o jogo. Estamos a utilizar os níveis do XSokoban.---*
 
+*---É um jogo em que um cavaleiro montado numa avestruz (o jogador) tem de tirar os outros cavaleiros (os inimigos) das suas avestruzes com a sua lança. Quando dois cavaleiros colidem, ganha aquele que está mais alto (se as alturas forem iguais, há empate). O jogador pode saltar infinitamente, mas o movimento é restrito pelo facto de ser difícil abrandar e mudar de direção (principalmente no ar). Quando um inimigo é derrotado, deixa para trás um ovo que, se não for apanhado pelo jogador rápido que chegue, cria outro inimigo.---*
+
 ### UI
 
 ![UI](ui.png)
