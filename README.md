@@ -24,10 +24,6 @@
 
 ### Descrição
 
-*---É um jogo de puzzle em que o objetivo do jogo é empurrar caixotes para um sítio indicado. 
-Para empurrar o caixote é preciso ir ao outro lado empurrá-lo. 
-Ou seja, se ele ficar junto à parede, a pessoa precisa de reiniciar o jogo. Estamos a utilizar os níveis do XSokoban.---*
-
 *---É um jogo em que um cavaleiro montado numa avestruz (o jogador) tem de tirar os outros cavaleiros (os inimigos) das suas avestruzes com a sua lança. Quando dois cavaleiros colidem, ganha aquele que está mais alto (se as alturas forem iguais, há empate). O jogador pode saltar infinitamente, mas o movimento é restrito pelo facto de ser difícil abrandar e mudar de direção (principalmente no ar). Quando um inimigo é derrotado, deixa para trás um ovo que, se não for apanhado pelo jogador rápido que chegue, cria outro inimigo.---*
 
 ### UI
@@ -41,8 +37,11 @@ Ou seja, se ele ficar junto à parede, a pessoa precisa de reiniciar o jogo. Est
 ### Tarefas
 
 1. carregar os níveis
-1. desenhar a matriz do nível
-1. ler teclas e mover as peças
-2. verificar se jogador chegou ao fim do nível
+2. definir o movimento do jogador
+3. criar inimigos e o seu movimento
+4. estabelecer colisões entre jogador e inimigo
+5. eliminar inimigo/jogador dependendo do resultado
+6. criar ovos
+7. mudar de layout depois de x inimigos serem derrotados
 
-- Atualizado a última vez em 07/12/2021
+- Atualizado a última vez em 14/12/2021
