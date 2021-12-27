@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 pygame.init()
 
@@ -12,7 +13,6 @@ blocksize = (32,16)
 screensize = (1024,768)
 
 enemlist = []
-enemhitbox = []
 egglist = []
 
 
@@ -31,8 +31,11 @@ jogy = 592-60
 speed_dict = {-4: -1.2, -3: -0.8, -2: -0.4, -1: -0.2, 0: 0, 1: 0.2, 2: 0.4, 3: 0.8, 4: 1.2}
 speed = 0
 jogvy = 0
+jogvx = 0
 
 left = right = False
+slide = False
+sliding = False
 
 
 clock = pygame.time.Clock()
@@ -60,8 +63,10 @@ while running:
                 right = False
 
     #2
+    oldspeed = speed
+    oldjogx = jogx
     joghitbox = pygame.Rect(jogx,jogy, jogsize[0], jogsize[1])
-
+    enemhitbox = []
     if enemlist == []:
         for i in range(4):
             enemlist.append([random.randint(0,1)*(screensize[0]-enemsize[0]),random.randint(0,768-176-enemsize[0]),random.randint(0,1),random.randint(0,1)])
@@ -69,19 +74,20 @@ while running:
     for inimigo in enemlist:
         enemhitbox.append(pygame.Rect(inimigo[0],inimigo[1],enemsize[0],enemsize[1]))
 
-
-                
+           
     dt = clock.tick()
     tempo += dt
     if tempo >= 250:
         move = True
+
+
     
     if abs(speed) >= 3:
         slide = True
     else:
         slide = False
 
-    if move and (jogvy == 0 or jump):
+    if move and (jogvy == 0 or jump) and not sliding:
         if left and speed != -4:
             tempo = 0
             speed -= 1
@@ -89,32 +95,51 @@ while running:
             tempo = 0
             speed += 1
 
-    if jump:
+    if slide and (abs(oldspeed) - abs(speed)) == 1:
+        sliding = True
+        slide_dir = right
+
+
+    if sliding:
+        if slide_dir:
+            jogvx += 0.001*dt
+        else:
+            jogvx -= 0.001*dt
+
+
+
+    if jump and not sliding:
         jogvy -= 1
     else:
         jogvy += 0.003*dt
 
 
-
     for platform in platforms:
-        if joghitbox.colliderect(platform):
+        if jogy <=0:
+            jogvy = 0.3
+            break
+        elif joghitbox.colliderect(platform):
             if abs(joghitbox.bottom - platform.top) <= 1:
                 jogvy = 0
                 jogy = platform.top-jogsize[1]
-            elif abs(joghitbox.top - platform.bottom) <=1 or jogy <= 0:
+            elif abs(joghitbox.top - platform.bottom) <=1:
                 jogvy = 0.3
             elif abs(joghitbox.left - platform.right) <=1 or abs(joghitbox.right - platform.left) <=1:
                 speed *= -1
         for i in range(len(enemlist)):
+            if enemhitbox[i].top <= 0:
+                enemlist[i][3] = int(not enemlist[i][3])
             if enemhitbox[i].colliderect(platform):
                 if abs(enemhitbox[i].bottom - platform.top) <=1 or abs(enemhitbox[i].top - platform.bottom) <=1:
                     enemlist[i][3] = int(not enemlist[i][3])
-                    print("a")
                 elif abs(enemhitbox[i].left - platform.right) <=1 or abs(enemhitbox[i].right - platform.left) <= 1:
                     enemlist[i][2] = int(not enemlist[i][2])
-                    print("b")
-    jogx = (jogx + speed_dict[speed])%screensize[0]
+    jogx = (jogx + speed_dict[speed])%screensize[0] + jogvx
     jogy += jogvy
+    if sliding and math.copysign(1, jogvx) != math.copysign(1, oldjogx - jogx):
+        sliding = False
+        jogvx = 0
+        speed = 0
     
     #3
     screen.blit(nivel, (0, 0))
