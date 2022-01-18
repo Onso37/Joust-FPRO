@@ -11,7 +11,7 @@ jogsprite = pygame.sprite.Sprite()
 jogsprite.image = jogador_img
 jogsprite.rect = jogsprite.image.get_rect()
 
-joggroup = pygame.sprite.Group()
+joggroup = pygame.sprite.RenderUpdates()
 joggroup.add(jogsprite)
 
 

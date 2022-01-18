@@ -15,22 +15,6 @@ screensize = (1024,768)
 enemlist = []
 egglist = []
 
-def jogmorreu():
-    a = 1
-
-def spawnposition(ptero = False):
-    x = random.randint(0,1)*(screensize[0]-enemsize[0])
-    yzone = 2 if x == 0 else random.randint(2,3)
-    if ptero:
-        yzone = random.randint(2,3)
-    if yzone == 2:
-        y = random.randint(97, 303-enemsize[1])
-    else:
-        y = random.randint(321, 560-enemsize[1])
-    return (x,y)
-    
-    
-
 
 platforms = [pygame.Rect(0,80,192,16), pygame.Rect(0,304,256,16), pygame.Rect(832,80,192,16), pygame.Rect(768,304,256,16), pygame.Rect(320,160,384,16), pygame.Rect(352,384,320,16), pygame.Rect(0,768-176,1024,176)]
 nivel = pygame.image.load("nivel.png")
@@ -43,11 +27,7 @@ jogador_imgj2 = pygame.image.load("jogadorj2.png")
 platS = pygame.image.load("platformS.png")
 platL = pygame.image.load("platformL.png")
 ovo_img = pygame.image.load("ovo.png")
-ptero_img1 = pygame.image.load("ptero1.png")
-ptero_img2 = pygame.image.load("ptero2.png")
 
-ptero_img1.set_colorkey((0,0,0))
-ptero_img2.set_colorkey((0,0,0))
 ovo_img.set_colorkey((0,0,0))
 inimigo_img = pygame.image.load("inimigo.png")
 inimigo_img2 = pygame.image.load("inimigo2.png")
@@ -61,19 +41,15 @@ inimigo_img.set_colorkey((0,0,0))
 inimigo_img2.set_colorkey((0,0,0))
 tempo = 0
 inimigo_imgL = [inimigo_img, inimigo_img2, inimigo_img, inimigo_img2]
-inimigo_flipL = [pygame.transform.flip(x, True, False) for x in inimigo_imgL]
 jogador_imgL = [jogador_img, jogador_img2, jogador_img3, jogador_img4]
-jogador_flipL = [pygame.transform.flip(x, True, False) for x in jogador_imgL]
 jogador_imgjL = [jogador_imgj1, jogador_imgj2, jogador_imgj1, jogador_imgj2]
-jogador_flipjL = [pygame.transform.flip(x, True, False) for x in jogador_imgjL]
-ptero_imgL = [ptero_img1, ptero_img2, ptero_img1, ptero_img2]
 walk = 0
 
 jogx = 100
-jogy = 592-jogsize[1]
+jogy = 592-60
 
 
-speed_dict = {-4: -0.3, -3: -0.2, -2: -0.1, -1: -0.05, 0: 0, 1: 0.05, 2: 0.1, 3: 0.2, 4: 0.3}
+speed_dict = {-4: -1.2, -3: -0.8, -2: -0.4, -1: -0.2, 0: 0, 1: 0.2, 2: 0.4, 3: 0.8, 4: 1.2}
 speed = 0
 jogvy = 0
 jogvx = 0
@@ -81,7 +57,6 @@ jogvx = 0
 left = right = False
 slide = False
 sliding = False
-pterochance = 0
 
 jogsprite = pygame.sprite.Sprite()
 jogsprite.image = jogador_img
@@ -91,7 +66,6 @@ joggroup = pygame.sprite.RenderUpdates()
 joggroup.add(jogsprite)
 
 inimigogroup = pygame.sprite.RenderUpdates()
-pterogroup = pygame.sprite.RenderUpdates()
 
 platformgroup = pygame.sprite.RenderUpdates()
 platformlist = [(192-320,80),(256-320,304),(832,80),(768,304)]
@@ -121,16 +95,15 @@ platformgroup.add(smallPlat)
 platformgroup.add(ground)
 platformgroup.add(sky)
 
-touch = 0
+touch = True
 
 lvltransition = True
-pteroalive = False
 
 clock = pygame.time.Clock()
 running = True
 while running:
     #1
-    walk = (walk + 0.001) %4
+    walk = (walk + 0.01) %4
     dead = []
     move = False
     jump = False
@@ -155,11 +128,9 @@ while running:
     #2
     oldspeed = speed
     oldjogx = jogx
-
     if enemlist == []:
         for i in range(4):
-            spawn = spawnposition()
-            enemlist.append([spawn[0],spawn[1],random.randint(0,1),random.randint(0,1)])
+            enemlist.append([random.randint(0,1)*(screensize[0]-enemsize[0]),random.randint(0,768-176-enemsize[0]),random.randint(0,1),random.randint(0,1)])
             tempsprite = pygame.sprite.Sprite()
             tempsprite.image = inimigo_img
             tempsprite.rect = pygame.Rect(enemlist[-1][0], enemlist[-1][1], enemsize[0], enemsize[1])
@@ -172,20 +143,9 @@ while running:
         platformgroup.draw(screen)
         pygame.display.flip()
     lvltransition = False
-    inimigoxdir = [x[2] for x in enemlist]
 
-    if random.random() < pterochance and not pteroalive:
-        pterosprite = pygame.sprite.Sprite()
-        pterosprite.image = ptero_img1
-        pterox = 0
-        pteroy = spawnposition(True)[1]
-        pterosprite.rect = pygame.Rect(pterox, pteroy, 128, 32)
-        pterogroup.add(pterosprite)
-        pteroalive = True
-    
     dt = clock.tick()
     tempo += dt
-    
     if tempo >= 250:
         move = True
 
@@ -211,22 +171,22 @@ while running:
 
     if sliding:
         if slide_dir:
-            jogvx += 0.00025*dt
+            jogvx += 0.001*dt
         else:
-            jogvx -= 0.00025*dt
+            jogvx -= 0.001*dt
 
 
 
     if jump and not sliding:
-        jogvy -= 0.3
-    else:
-        jogvy += 0.0012*dt
-    touch -= 1
+        jogvy -= 1
+    elif not touch:
+        jogvy += 0.003*dt
+    touch = False
 
     ceiling = False
     if jogy <=0:
         ceiling = True
-        jogvy = 0.012
+        jogvy = 0.3
         
     joghitbox = jogsprite.rect
     jogplat = pygame.sprite.spritecollide(jogsprite, platformgroup, False)
@@ -235,9 +195,9 @@ while running:
         if abs(joghitbox.bottom - platform.top) <= 1:
             jogvy = 0
             jogy = platform.top-jogsize[1]
-            touch = 200
+            touch = True
         elif abs(joghitbox.top - platform.bottom) <=1:
-            jogvy = 0.012
+            jogvy = 0.3
         elif abs(joghitbox.left - platform.right) <=1 or abs(joghitbox.right - platform.left) <=1:
             speed *= -1        
 
@@ -247,17 +207,14 @@ while running:
         for inim in inimplat[plat]:
             i = inimigogroup.sprites().index(inim)
             enemhitbox = inim.rect
-            if abs(enemhitbox.bottom - plathitbox.top) <=1 or abs(enemhitbox.top - plathitbox.bottom) <=1 :
+            if abs(enemhitbox.bottom - plathitbox.top) <=1 or abs(enemhitbox.top - plathitbox.bottom) <=1:
                 enemlist[i][3] = int(not enemlist[i][3])
             elif abs(enemhitbox.left - plathitbox.right) <=1 or abs(enemhitbox.right - plathitbox.left) <= 1:
                 enemlist[i][2] = int(not enemlist[i][2])
-            if enemlist[i][1] < 0:
-                enemlist[i][1] = 1
-            if enemlist[i][1] > 592:
-                enemlist[i][1] = 592-enemsize[1]
     
      
     
+
     joginim = pygame.sprite.spritecollide(jogsprite, inimigogroup, False)
     for i in joginim:
         index = inimigogroup.sprites().index(i)
@@ -267,30 +224,16 @@ while running:
                 i.image = ovo_img
                 i.rect = pygame.Rect(enemlist[index][0], enemlist[index][1], 40, 20)
                 enemlist[index].append(0)
-                jogvy -= 0.2
+                jogvy -= 0.4
                 speed = math.copysign(1,speed) if speed != 0 else 0
-            elif enemlist[index][4] >= 750:
+            elif enemlist[index][4] >= 2500:
                 dead.append((index,i))
         elif enemhitbox.top < joghitbox.top and len(enemlist[index]) == 4:
-            jogmorreu()
+            print("boo")
         else:
             speed = -speed
-            enemlist[index][2] = int(not enemlist[index][2])
+            enemlist[index][2] = int(not enemlist[index][2])        
 
-    if pteroalive:
-        jogptero = pygame.sprite.spritecollide(jogsprite, pterogroup, False)
-        for ptero in jogptero:
-            pterohitbox = ptero.rect
-            if abs(pterohitbox.right - joghitbox.left) <= 1:
-                pterogroup.remove(ptero)
-                pteroalive = False
-                pterochance = 0
-        pterosprite.image = ptero_imgL[int(walk)]
-        pterox += 0.15
-        pterosprite.rect = pygame.Rect(pterox, pteroy, 128, 32)
-        if pterox > 1700:
-            pterox = 0
-            pteroy = spawnposition(True)[1]
 
     for d in dead:
         del enemlist[d[0]]
@@ -301,7 +244,7 @@ while running:
 
 
     
-    if sliding and abs(jogx-oldjogx) < 0.00005:
+    if sliding and math.copysign(1, jogvx) != math.copysign(1, oldjogx - jogx):
         sliding = False
         jogvx = 0
         speed = 0
@@ -309,9 +252,10 @@ while running:
     jogsprite.rect = pygame.Rect(jogx, jogy, jogsize[0], jogsize[1])
     counter = 0
     for inim in inimigogroup.sprites():
-        enemlist[counter][0] += 0.6 * (enemlist[counter][2]-0.5) * dt
+
+        enemlist[counter][0] += 0.6 * (enemlist[counter][2]-0.5)
         enemlist[counter][0] %= screensize[0]
-        enemlist[counter][1] += 0.1 * (enemlist[counter][3]-0.5) * dt
+        enemlist[counter][1] += 0.6 * (enemlist[counter][3]-0.5)
         inim.rect= pygame.Rect(enemlist[counter][0], enemlist[counter][1], enemsize[0], enemsize[1])
         if len(enemlist[counter]) == 5:
             enemlist[counter][4] += dt
@@ -320,37 +264,21 @@ while running:
                 inim.image = inimigo_img
                 enemlist[counter].pop()
         else:
-            if enemlist[counter][2] == 0:
-                inim.image = inimigo_flipL[int(walk)]
-            else:
-                inim.image = inimigo_imgL[int(walk)]
-            inim.rect= pygame.Rect(enemlist[counter][0], enemlist[counter][1], enemsize[0], enemsize[1])    
+            inim.rect= pygame.Rect(enemlist[counter][0], enemlist[counter][1], enemsize[0], enemsize[1])
         counter += 1
-        
-    if speed >= 0:
-        if touch > 0:
-            jogsprite.image = jogador_imgL[0 if speed == 0 else int(walk)]
-        else:
-            jogsprite.image = jogador_imgjL[int(walk)]
-    else:
-        if touch > 0:
-            jogsprite.image = jogador_flipL[0 if speed == 0 else int(walk)]
-        else:
-            jogsprite.image = jogador_flipjL[int(walk)]
-
     
-
-    pterochance += 0.00000000001
     #3
     inimigogroup.clear(screen, nivel)
     joggroup.clear(screen, nivel)
     platformgroup.clear(screen, nivel)
-    pterogroup.clear(screen, nivel)
     pygame.display.update(inimigogroup.draw(screen))
     pygame.display.update(joggroup.draw(screen))
     pygame.display.update(platformgroup.draw(screen))
-    pygame.display.update(pterogroup.draw(screen))
-
+#    if touch:
+#        jogsprite
+#        screen.blit(jogador_imgL[0 if speed == 0 else int(walk)], (int(jogx), int(jogy)))
+#    else:
+#        screen.blit(jogador_imgjL[int(walk)], (int(jogx), int(jogy)))
 
 
 
