@@ -11,12 +11,11 @@ jogsize = (64,60)
 enemsize = (64,52)
 blocksize = (32,16)
 screensize = (1024,768)
+lives = 4
 
 enemlist = []
 egglist = []
 
-def jogmorreu():
-    a = 1
 
 def spawnposition(ptero = False):
     x = random.randint(0,1)*(screensize[0]-enemsize[0])
@@ -30,7 +29,10 @@ def spawnposition(ptero = False):
     return (x,y)
     
     
-
+font = pygame.font.Font('freesansbold.ttf', 16)
+text = font.render(f'{lives}', True, (255,255,255), (0,0,0))
+textRect = text.get_rect()
+textRect.center = (629, 698)
 
 platforms = [pygame.Rect(0,80,192,16), pygame.Rect(0,304,256,16), pygame.Rect(832,80,192,16), pygame.Rect(768,304,256,16), pygame.Rect(320,160,384,16), pygame.Rect(352,384,320,16), pygame.Rect(0,768-176,1024,176)]
 nivel = pygame.image.load("nivel.png")
@@ -82,6 +84,7 @@ left = right = False
 slide = False
 sliding = False
 pterochance = 0
+immortal = 0
 
 jogsprite = pygame.sprite.Sprite()
 jogsprite.image = jogador_img
@@ -169,6 +172,7 @@ while running:
                 platformgroup.remove(bigPlat)
                 lvltransition = True
         screen.blit(nivel, (0, 0))
+        screen.blit(text, textRect)
         platformgroup.draw(screen)
         pygame.display.flip()
     lvltransition = False
@@ -271,8 +275,19 @@ while running:
                 speed = math.copysign(1,speed) if speed != 0 else 0
             elif enemlist[index][4] >= 750:
                 dead.append((index,i))
-        elif enemhitbox.top < joghitbox.top and len(enemlist[index]) == 4:
-            jogmorreu()
+        elif enemhitbox.top < joghitbox.top and len(enemlist[index]) == 4 and immortal == 0:
+            jogx = 100
+            jogy = 592-jogsize[1]
+            speed = 0
+            jogvx = 0
+            jogvy = 0
+            immortal = 500
+            lives -= 1
+            text = font.render(f'{lives}', True, (255,255,255), (0,0,0))
+            textRect = text.get_rect()
+            textRect.center = (629, 698)
+            screen.blit(text, textRect)
+            pygame.display.flip()
         else:
             speed = -speed
             enemlist[index][2] = int(not enemlist[index][2])
@@ -285,6 +300,19 @@ while running:
                 pterogroup.remove(ptero)
                 pteroalive = False
                 pterochance = 0
+            elif immortal == 0:
+                jogx = 100
+                jogy = 592-jogsize[1]
+                speed = 0
+                jogvx = 0
+                jogvy = 0
+                immortal = 500
+                lives -= 1
+                text = font.render(f'{lives}', True, (255,255,255), (0,0,0))
+                textRect = text.get_rect()
+                textRect.center = (629, 698)
+                screen.blit(text, textRect)
+                pygame.display.flip()
         pterosprite.image = ptero_imgL[int(walk)]
         pterox += 0.15
         pterosprite.rect = pygame.Rect(pterox, pteroy, 128, 32)
@@ -293,6 +321,7 @@ while running:
             pteroy = spawnposition(True)[1]
 
     for d in dead:
+        print(d[0])
         del enemlist[d[0]]
         inimigogroup.remove(d[1])
     
@@ -338,7 +367,6 @@ while running:
         else:
             jogsprite.image = jogador_flipjL[int(walk)]
 
-    
 
     pterochance += 0.00000000001
     #3
@@ -350,7 +378,13 @@ while running:
     pygame.display.update(joggroup.draw(screen))
     pygame.display.update(platformgroup.draw(screen))
     pygame.display.update(pterogroup.draw(screen))
-
+    if immortal == 500:
+        pygame.time.delay(4000)
+        clock.tick(1)
+    if immortal > 0:
+        immortal -= 1
+    if lives < 0:
+        running = False
 
 
 
