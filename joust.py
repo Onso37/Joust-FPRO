@@ -13,6 +13,19 @@ blocksize = (32,16)
 screensize = (1024,768)
 lives = 4
 
+startgame = False
+pygame.display.set_caption('Press SPACE to start')
+while True:
+    for ev in pygame.event.get():
+        if ev.type == pygame.KEYDOWN:
+            if ev.key == pygame.K_SPACE:
+                startgame = True
+    if startgame:
+        break
+pygame.display.set_caption("Joust")
+
+
+
 enemlist = []
 egglist = []
 
