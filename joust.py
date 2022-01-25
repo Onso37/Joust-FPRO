@@ -315,7 +315,7 @@ while running:
                 i.image = ovo_img
                 i.rect = pygame.Rect(enemlist[index][0], enemlist[index][1], 40, 20)
                 enemlist[index].append(0)
-                jogvy -= 0.025
+                jogvy -= 0.05
                 speed = math.copysign(1,speed) if speed != 0 else 0
             elif enemhitbox.top < joghitbox.top and immortal == 0:
                 jogx = 100
@@ -365,16 +365,10 @@ while running:
         if pterox > 1700:
             pterox = 0
             pteroy = spawnposition(True)[1]
-    
-    deaderror=1
-    for d in dead:
-        try:
-            del enemlist[d[0]]
-        except IndexError:
-            del enemlist[d[0]-deaderror]
-            deaderror +=1
-        finally:
-            inimigogroup.remove(d[1])
+
+    for d in sorted(dead, key=lambda t: t[0], reverse=True):
+        del enemlist[d[0]]
+        inimigogroup.remove(d[1])
     
     jogx = (jogx + speed_dict[speed])%screensize[0] + jogvx
     jogy += jogvy
@@ -442,7 +436,7 @@ while running:
         immortal -= 1
     if lives <= 0:
         running = False
-    if abs(jogvx) >= 5:
+    if abs(jogvx) >= 1:
         jogvx = 0
         sliding = False
 
