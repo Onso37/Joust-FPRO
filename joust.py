@@ -365,10 +365,16 @@ while running:
         if pterox > 1700:
             pterox = 0
             pteroy = spawnposition(True)[1]
-
+    
+    deaderror=1
     for d in dead:
-        del enemlist[d[0]]
-        inimigogroup.remove(d[1])
+        try:
+            del enemlist[d[0]]
+        except IndexError:
+            del enemlist[d[0]-deaderror]
+            deaderror +=1
+        finally:
+            inimigogroup.remove(d[1])
     
     jogx = (jogx + speed_dict[speed])%screensize[0] + jogvx
     jogy += jogvy
