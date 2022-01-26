@@ -254,16 +254,17 @@ while running:
             tempo = 0
             speed += 1
 
-    if slide and (abs(oldspeed) - abs(speed)) == 1:
+    if slide and (abs(oldspeed) - abs(speed)) == 1 and not sliding:
         sliding = True
+        slidespeed = speed_dict[speed]
         slide_dir = right
 
 
     if sliding:
         if slide_dir:
-            jogvx += 0.00025*dt
+            slidespeed += 0.00025*dt
         else:
-            jogvx -= 0.00025*dt
+            slidespeed -= 0.00025*dt
 
 
 
@@ -370,7 +371,8 @@ while running:
         del enemlist[d[0]]
         inimigogroup.remove(d[1])
     
-    jogx = (jogx + speed_dict[speed]*dt)%screensize[0] + jogvx
+    truespeed = speed_dict[speed] if not sliding else slidespeed
+    jogx = (jogx + truespeed*dt)%screensize[0] + jogvx
     jogy += jogvy
 
 
