@@ -435,7 +435,7 @@ while running:
         pygame.time.delay(4000)
         clock.tick(1)
     if immortal > 0:
-        immortal -= 1
+        immortal -= 0.5
     if lives <= 0:
         running = False
     if abs(jogvx) >= 0.2:
